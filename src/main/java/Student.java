@@ -1,9 +1,9 @@
 import com.sun.istack.NotNull;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /* ------  Custom key generation:----------
   1. create implementation of org.hibernate.id.IdentifierGenerator (it is an interface);
@@ -19,56 +19,91 @@ import javax.persistence.Table;
 */
 
 @Entity
-@Table//(name="student")
+@Table(name="student")
 public class Student {
     @Id
     @Column(name="email")   // annotation @Column(...) does not work if you do not have it in your database yet
-    private String email;
+    private String sEmail;
     @Column(name="name")
-    private String name;
+    private String sName;
     @Column(name = "password")
-    private String password;
+    private String sPass;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "studDetails")
+    private StudentDetails studDetails;
+
+//    @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
+//    private List<Course> sCourses = new ArrayList<>();
+
+//    public void setsCourses(List<Course> sCourses) {    //???
+//        this.sCourses = sCourses;
+//    }
+//
+//    public List<Course> getsCourses() {
+//        return sCourses;
+//    }
 
     public Student() {
-
+//        this.sEmail = "";
+//        this.sName = "";
+//        this.sPass = "";
+        //this.sCourses = new ArrayList<>();
     }
 
     public Student(String email, String name, String password) {
-        this.email = email;
-        this.name = name;
-        this.password = password;
+        this.sEmail = email;
+        this.sName = name;
+        this.sPass = password;
+        //this.sCourses = new ArrayList<>();
     }
 
-    public String getEmail() {
-        return email;
+    public void setsEmail(String sEmail) {
+        this.sEmail = sEmail;
     }
 
-    public String getName() {
-        return name;
+    public void setsName(String sName) {
+        this.sName = sName;
     }
 
-    public String getPassword() {
-        return password;
+    public void setsPass(String sPass) {
+        this.sPass = sPass;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setStudDetails(StudentDetails studDetails) {
+        this.studDetails = studDetails;
     }
 
-    public void setName(String name) {
-        this.name = name;
+//    public void setsCourses(List<Course> sCourses) {
+//        this.sCourses = sCourses;
+//    }
+
+    public String getsEmail() {
+        return sEmail;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public String getsName() {
+        return sName;
     }
+
+    public String getsPass() {
+        return sPass;
+    }
+
+    public StudentDetails getStudDetails() {
+        return studDetails;
+    }
+
+//    public List<Course> getsCourses() {
+//        return sCourses;
+//    }
 
     @Override
     public String toString() {
         return "Student{" +
-                "email='" + email + '\'' +
-                ", name='" + name + '\'' +
-                ", password='" + password + '\'' +
+                "sEmail='" + sEmail + '\'' +
+                ", name='" + sName + '\'' +
+                ", password='" + sPass + '\'' +
                 '}';
     }
 }

@@ -6,10 +6,11 @@ import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-    public static CourseService courseService;
+    public static CourseService courseService = new CourseService();
     public static void main(String[] args) {
         EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("MSMDB");
         EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -82,12 +83,9 @@ public class Main {
         Student student5 = entityManager.find(Student.class, student1.getsEmail());
         System.out.println(student5.toString());
 
-
         entityManager.getTransaction().begin();
         System.out.println("\n------------------Deleting a student using createQuery():-----------------------");
         entityManager.createQuery("delete from Student where sEmail='student1@gmail.com'").executeUpdate(); // WHY DOESN'T DELETE A CASCADED ROW???!
-
-
 
         System.out.println("\n------------------Deleting a student using delete():-----------------------");
         //entityManager.remove(student2);
@@ -95,6 +93,34 @@ public class Main {
         entityManager.getTransaction().commit();
         //displayStudents(theStudents);
 
+        List<Course> output = courseService.getAllCourses();
+        for (Course course : output) {
+            System.out.println(course.toString());
+        }
+//        Instructor instructor = courseService.getInstructor("Marina");
+//        System.out.println(instructor.toString());
+
+        entityManager.getTransaction().begin();
+        Instructor instructor1 = new Instructor("Marina");
+        Instructor instructor2 = new Instructor("John");
+        Course math = new Course("Math");
+        Course history = new Course("History");
+        Course programming = new Course("JavaProgramming");
+        instructor1.addCourse(math);
+        instructor1.addCourse(programming);
+        instructor2.addCourse(history);
+        entityManager.persist(instructor1);
+        entityManager.persist(instructor2);
+        entityManager.persist(history);
+        entityManager.persist(math);
+        entityManager.persist(programming);
+        entityManager.getTransaction().commit();
+
+        System.out.println("***************************************************************************************************************");
+        Instructor instructorMarina = entityManager.find(Instructor.class, 1);
+        System.out.println("Looking for instructor Marina: ");
+        System.out.println(instructorMarina.toString());
+        System.out.println("courses: "+instructorMarina.getListCourses());
 
 
         System.out.println("Done!");

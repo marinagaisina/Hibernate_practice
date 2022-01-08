@@ -1,6 +1,7 @@
 package jpa.entitymodels;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -17,13 +18,18 @@ public class Instructor {
             cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<Course> listCourses;
 
-    public Instructor(String name, List<Course> listCourses) {
+    public Instructor(String name) {
         this.name = name;
-        this.listCourses = listCourses;
+        this.listCourses = new ArrayList<>();
     }
-
     public Instructor() {
-
+    }
+    public void addCourse(Course course) {
+        if (listCourses == null) {
+            listCourses = new ArrayList<>();
+        }
+        listCourses.add(course);
+        course.setInstructor(this);
     }
 
     public int getiId() {
@@ -44,5 +50,12 @@ public class Instructor {
 
     public void setListCourses(List<Course> listCourses) {
         this.listCourses = listCourses;
+    }
+
+    @Override
+    public String toString() {
+        return "Instructor: code "+
+                this.iId+", "+
+                this.name;
     }
 }

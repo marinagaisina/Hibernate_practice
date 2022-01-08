@@ -12,13 +12,13 @@ public class Course {
     @Column(name="cName")
     private String cName;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name="instructorId")
     private Instructor instructor;
 
-    public Course(String cName, Instructor instructor) {
+    public Course(String cName) {
         this.cName = cName;
-        this.instructor = instructor;
+        this.instructor = null;
     }
 
     public Course() {
@@ -51,5 +51,11 @@ public class Course {
 
     public Instructor getInstructor() {
         return instructor;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder().append(this.cId).append(". ")
+                .append(this.cName).append(", ").append(this.instructor).toString();
     }
 }

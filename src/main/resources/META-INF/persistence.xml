@@ -5,6 +5,9 @@
              version="2.2">
     <persistence-unit name="MSMDB">
         <class>jpa.entitymodels.Student</class>
+        <class>jpa.entitymodels.StudentDetails</class>
+        <class>jpa.entitymodels.Course</class>
+        <class>jpa.entitymodels.Instructor</class>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MariaDB102Dialect"/>
             <property name="hibernate.connection.url" value="jdbc:mariadb://localhost:3308/MSMDB"/>

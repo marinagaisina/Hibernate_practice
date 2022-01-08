@@ -4,6 +4,8 @@ import jpa.dao.CourseDAO;
 import jpa.entitymodels.Course;
 import jpa.entitymodels.Instructor;
 import jpa.entitymodels.Student;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -37,9 +39,28 @@ public class CourseService implements CourseDAO {
         EntityTransaction transaction = entityManager.getTransaction();
         transaction.begin();
 
-        Query query = entityManager.createQuery("select i from Instructor i where i.name =:requiredName");
-        query.setParameter("requiredName", instructorName);
+        Query query = entityManager.createQuery("select i from Instructor i where i.name =:requiredName")
+                .setParameter("requiredName", instructorName);
 
-        return (Instructor) query.getResultList().get(0);
+        List<Instructor> list = entityManager.createQuery("select i from Instructor i where i.name =:requiredName")
+                .setParameter("requiredName", instructorName).getResultList();
+
+        Instructor instructor = (Instructor) query.getResultList().get(0);
+        entityManager.close();
+        entityManagerFactory.close();
+        return instructor;
+
+/* ---------------------- using Criteria ! -----------------------------
+        public Employee getEmployeeByEmail(String empEmail) {
+            Employee e = (Employee)
+            Criteria crit = sessionFactory.getCurrentSession().createCriteria(Employee.class);
+            crit.add(Restrictions.eq("email", empEmail)).uniqueResult();
+            return e;
+        }
+        Query query= sessionFactory.getCurrentSession().
+        createQuery("from Category where name=:name");
+        query.setParameter("name", name);
+        Category category = (Category) query.uniqueResult();
+ */
     }
 }

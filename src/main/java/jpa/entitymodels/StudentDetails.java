@@ -1,5 +1,4 @@
-//import jdk.nashorn.internal.objects.annotations.Getter;
-//import jdk.nashorn.internal.objects.annotations.Setter;
+package jpa.entitymodels;
 
 import javax.persistence.*;
 
@@ -12,6 +11,11 @@ public class StudentDetails {
     private int studDetailsId;
     @Column(name="studentDetails")
     private String studentDetails;
+    @OneToOne(mappedBy = "stud_Details",
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    //not "ALL", we won't delete jpa.entities.Instructor instance once we delete InstructorDetails
+    //in table student, we have set a reference to the instructor's details to "null" and then delete instructorDetails without deleting instructor instance
+    private Student student;
 
     public StudentDetails(String studentDetails) {
         //this.studDetailsId = studDetailsId;
@@ -20,6 +24,14 @@ public class StudentDetails {
 
     public StudentDetails() {
 
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
     }
 
     public int getStudDetailsId() {

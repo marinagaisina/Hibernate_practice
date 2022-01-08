@@ -1,9 +1,6 @@
-import com.sun.istack.NotNull;
+package jpa.entitymodels;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 /* ------  Custom key generation:----------
   1. create implementation of org.hibernate.id.IdentifierGenerator (it is an interface);
@@ -31,18 +28,11 @@ public class Student {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "studDetails")
-    private StudentDetails studDetails;
+    private StudentDetails stud_Details;
 
-//    @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
-//    private List<Course> sCourses = new ArrayList<>();
-
-//    public void setsCourses(List<Course> sCourses) {    //???
-//        this.sCourses = sCourses;
-//    }
-//
-//    public List<Course> getsCourses() {
-//        return sCourses;
-//    }
+//    @OneToMany(mappedBy = "student", fetch = FetchType.LAZY,
+//    cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
+//    private List<jpa.entities.Course> sCourses;
 
     public Student() {
 //        this.sEmail = "";
@@ -71,10 +61,10 @@ public class Student {
     }
 
     public void setStudDetails(StudentDetails studDetails) {
-        this.studDetails = studDetails;
+        this.stud_Details = studDetails;
     }
 
-//    public void setsCourses(List<Course> sCourses) {
+//    public void setsCourses(List<jpa.entities.Course> sCourses) {
 //        this.sCourses = sCourses;
 //    }
 
@@ -91,16 +81,16 @@ public class Student {
     }
 
     public StudentDetails getStudDetails() {
-        return studDetails;
+        return stud_Details;
     }
 
-//    public List<Course> getsCourses() {
+//    public List<jpa.entities.Course> getsCourses() {
 //        return sCourses;
 //    }
 
     @Override
     public String toString() {
-        return "Student{" +
+        return "jpa.entities.Student{" +
                 "sEmail='" + sEmail + '\'' +
                 ", name='" + sName + '\'' +
                 ", password='" + sPass + '\'' +

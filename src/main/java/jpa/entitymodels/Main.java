@@ -30,7 +30,7 @@ public class Main {
         student1.setStudDetails(stud1Details);
         student2.setStudDetails(stud2Details);
         student3.setStudDetails(stud3Details);
-        entityManager.getTransaction().commit();
+        //entityManager.getTransaction().commit();
 
         System.out.println("Saving the students and student details...");
 
@@ -42,7 +42,8 @@ public class Main {
         entityManager.persist(student1);
         entityManager.persist(student2);
         entityManager.persist(student3);
-
+        //entityManager.flush();
+        entityManager.getTransaction().commit();
         // find out the student's email: primary key:
         System.out.println("Saved students. jpa.entities.Student's primary key is: "+student1.getsEmail());
         System.out.println("\n----------------Retrieving (getting) the student's data from DB using entityManager.find():----------------------------");
@@ -68,10 +69,10 @@ public class Main {
         System.out.println("Updated student name is : "+gettingStudent.getsName());
 
         System.out.println("\n------------------Updating all the students passwords using createQuery():-----------------------");
-        entityManager.getTransaction().begin();
-        String query = "update Student s set s.sPass=:passForAll";
+        //entityManager.getTransaction().begin();
+        String query = "update Instructor i set i.name=:newName where i.name like 'Anderea%'";
         Query query1 = entityManager.createQuery(query);
-        query1.setParameter("passForAll", "pass1234");
+        query1.setParameter("newName", "NotAndrea");
         query1.executeUpdate();
         int rows = query1.executeUpdate();
         entityManager.getTransaction().commit();
@@ -97,31 +98,29 @@ public class Main {
         for (Course course : output) {
             System.out.println(course.toString());
         }
-//        Instructor instructor = courseService.getInstructor("Marina");
-//        System.out.println(instructor.toString());
-
-        entityManager.getTransaction().begin();
-        Instructor instructor1 = new Instructor("Marina");
-        Instructor instructor2 = new Instructor("John");
-        Course math = new Course("Math");
-        Course history = new Course("History");
-        Course programming = new Course("JavaProgramming");
-        instructor1.addCourse(math);
-        instructor1.addCourse(programming);
-        instructor2.addCourse(history);
-        entityManager.persist(instructor1);
-        entityManager.persist(instructor2);
-        entityManager.persist(history);
-        entityManager.persist(math);
-        entityManager.persist(programming);
-        entityManager.getTransaction().commit();
+        //entityManager.flush();
+//        entityManager.getTransaction().begin();
+//        Instructor instructor1 = new Instructor("Marina");
+//        Instructor instructor2 = new Instructor("John");
+//        Course math = new Course("Math");
+//        Course history = new Course("History");
+//        Course programming = new Course("JavaProgramming");
+//        instructor1.addCourse(math);
+//        instructor1.addCourse(programming);
+//        instructor2.addCourse(history);
+//        entityManager.persist(instructor1);
+//        entityManager.persist(instructor2);
+//        entityManager.persist(history);
+//        entityManager.persist(math);
+//        entityManager.persist(programming);
+//        entityManager.flush();
 
         System.out.println("***************************************************************************************************************");
         Instructor instructorMarina = entityManager.find(Instructor.class, 1);
-        System.out.println("Looking for instructor Marina: ");
-        System.out.println(instructorMarina.toString());
+        System.out.println("Looking for instructor Marina: "+instructorMarina.toString());
         System.out.println("courses: "+instructorMarina.getListCourses());
 
+        System.out.println(courseService.getInstructor("Marina").toString());
 
         System.out.println("Done!");
         entityManager.close();

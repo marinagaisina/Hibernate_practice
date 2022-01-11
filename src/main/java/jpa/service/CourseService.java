@@ -39,13 +39,14 @@ public class CourseService implements CourseDAO {
         EntityTransaction transaction = entityManager.getTransaction();
         transaction.begin();
 
-        Query query = entityManager.createQuery("select i from Instructor i where i.name =:requiredName")
+        Query query = entityManager.createQuery("select i from Instructor i where i.name =:requiredName", Instructor.class)
                 .setParameter("requiredName", instructorName);
 
-        List<Instructor> list = entityManager.createQuery("select i from Instructor i where i.name =:requiredName")
+        List<Instructor> list = entityManager.createQuery("select i from Instructor i where i.name =:requiredName", Instructor.class)
                 .setParameter("requiredName", instructorName).getResultList();
 
         Instructor instructor = (Instructor) query.getResultList().get(0);
+        transaction.commit();
         entityManager.close();
         entityManagerFactory.close();
         return instructor;

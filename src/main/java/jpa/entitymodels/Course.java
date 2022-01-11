@@ -5,20 +5,20 @@ import javax.persistence.*;
 @Table(name="course")
 public class Course {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="cId")
     private int cId;
 
     @Column(name="cName")
     private String cName;
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinColumn(name="instructorId")
     private Instructor instructor;
 
-    public Course(String cName) {
+    public Course(int cId, String cName, Instructor instructor) {
+        this.cId = cId;
         this.cName = cName;
-        this.instructor = null;
+        this.instructor = instructor;
     }
 
     public Course() {
@@ -27,6 +27,10 @@ public class Course {
 
     public int getcId() {
         return cId;
+    }
+
+    public void setcId(int cId) {
+        this.cId = cId;
     }
 
     public String getcName() {

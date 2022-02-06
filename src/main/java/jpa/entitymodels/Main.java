@@ -1,6 +1,7 @@
 package jpa.entitymodels;
 
 import jpa.service.CourseService;
+import org.hibernate.event.spi.SaveOrUpdateEvent;
 
 import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -11,39 +12,41 @@ import java.util.List;
 
 public class Main {
     public static CourseService courseService = new CourseService();
+
     public static void main(String[] args) {
         EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("MSMDB");
         EntityManager entityManager = entityManagerFactory.createEntityManager();
-        EntityTransaction transaction = entityManager.getTransaction();
-        transaction.begin();
+        entityManager.getTransaction().begin();
+
+        System.out.println("Creating new student details objects...");
+        StudentDetails stud1Details = new StudentDetails();
+        stud1Details.setStudentDetails("studentDetails1");
+        entityManager.persist(stud1Details);
+
+        StudentDetails stud2Details = new StudentDetails();
+        stud2Details.setStudentDetails("studentDetails2");
+        entityManager.persist(stud2Details);
+
+        StudentDetails stud3Details = new StudentDetails();
+        stud3Details.setStudentDetails("studentDetails3");
+        entityManager.persist(stud3Details);
 
         System.out.println("Creating new student objects...");
         Student student1 = new Student("student1@gmail.com", "Student1 LastName1", "password1");
         Student student2 = new Student("student2@gmail.com", "Student2 LastName2", "password2");
         Student student3 = new Student("student3@yahoo.com", "Student3 LastName3", "password3");
 
-        StudentDetails stud1Details = new StudentDetails("ksdfjsdlfkldjfkdjfkdjfkjd");
-        StudentDetails stud2Details = new StudentDetails("llllllllllllllllll");
-        StudentDetails stud3Details = new StudentDetails("oooooooooooo");
-
         System.out.println("Connecting Students and their details...");
         student1.setStudDetails(stud1Details);
         student2.setStudDetails(stud2Details);
         student3.setStudDetails(stud3Details);
-        //entityManager.getTransaction().commit();
 
         System.out.println("Saving the students and student details...");
-
-        /* no need to persist the connected tables!
-        entityManager.persist(stud1Details);
-        entityManager.persist(stud2Details);
-        entityManager.persist(stud3Details);
-         */
         entityManager.persist(student1);
         entityManager.persist(student2);
         entityManager.persist(student3);
-        //entityManager.flush();
         entityManager.getTransaction().commit();
+
         // find out the student's email: primary key:
         System.out.println("Saved students. jpa.entities.Student's primary key is: "+student1.getsEmail());
         System.out.println("\n----------------Retrieving (getting) the student's data from DB using entityManager.find():----------------------------");
@@ -51,78 +54,107 @@ public class Main {
         System.out.println(gettingStudent.toString());
 
         // Hibernate Query Language!
-        entityManager.getTransaction().begin();
         System.out.println("\n----------------Retrieving (getting) the student's data from DB using createQuery():----------------------------");
-        List<Student> theStudents = entityManager.createQuery("select a from Student a", Student.class).getResultList();
-        entityManager.getTransaction().commit();
-        displayStudents(theStudents);
 
+        String queryGetStudents = "select a from Student a";
+        List<Student> theStudents = entityManager.createQuery(queryGetStudents, Student.class).getResultList();
+        // SECOND WAY:
+        //theStudents = entityManager.createQuery("select a from Student a", Student.class).getResultList();
+        displayStudents(theStudents);
+        System.out.println("Getting a list of students with email like: '@gmail.com':");
         theStudents = entityManager.createQuery("select s from Student s where s.sEmail like '%@gmail.com'", Student.class).getResultList();
         displayStudents(theStudents);
 
-        entityManager.getTransaction().begin();
         System.out.println("\n------------------Updating student1 using student1.setName():----------------------------------");
+        entityManager.getTransaction().begin();
         student1.setsName("Student1update NoLastName");
         entityManager.getTransaction().commit();
 
         gettingStudent = entityManager.find(Student.class, student1.getsEmail()); // use the primary KEY!!
         System.out.println("Updated student name is : "+gettingStudent.getsName());
 
-        System.out.println("\n------------------Updating all the students passwords using createQuery():-----------------------");
-        //entityManager.getTransaction().begin();
-        String query = "update Instructor i set i.name=:newName where i.name like 'Anderea%'";
-        Query query1 = entityManager.createQuery(query);
-        query1.setParameter("newName", "NotAndrea");
-        query1.executeUpdate();
-        int rows = query1.executeUpdate();
+        System.out.println("\n------------------Updating password for an instructor with name like \"Odessa\" using createQuery():-----------------------");
+        entityManager.getTransaction().begin();
+        String queryUpdate = "update Instructor i set i.name=:newName where i.name like 'Odessa%'";
+        Query query = entityManager.createQuery(queryUpdate);
+        query.setParameter("newName", "NotOdessa");
+        query.executeUpdate();
+        int rows = query.executeUpdate();
+        System.out.println("Affected rows in Instructor table"+rows);
         entityManager.getTransaction().commit();
 
-        System.out.println("\n------------------Getting updated list of students from DB----------------------");
-        System.out.println("Affected rows"+rows);
-        theStudents = entityManager.createQuery("select a from Student a", Student.class).getResultList();
-        displayStudents(theStudents);
+        System.out.println("\n------------------Getting updated student1 from DB----------------------");
         Student student5 = entityManager.find(Student.class, student1.getsEmail());
         System.out.println(student5.toString());
 
+        System.out.println("\n------------------Deleting a student1 using createQuery():-----------------------");
         entityManager.getTransaction().begin();
-        System.out.println("\n------------------Deleting a student using createQuery():-----------------------");
-        entityManager.createQuery("delete from Student where sEmail='student1@gmail.com'").executeUpdate(); // WHY DOESN'T DELETE A CASCADED ROW???!
+        entityManager.createQuery("delete from Student s where s.sEmail='student1@gmail.com'").executeUpdate(); // WHY DOESN'T DELETE A CASCADED ROW???!
+        entityManager.getTransaction().commit();
 
-        System.out.println("\n------------------Deleting a student using delete():-----------------------");
-        //entityManager.remove(student2);
+        System.out.println("\nChecking list of Students after deleting student1:");
+        theStudents = entityManager.createQuery(queryGetStudents, Student.class).getResultList();
+        displayStudents(theStudents);
+        System.out.println("Check if cascaded row for student1 details was deleted too: ");
+        String queryGetStudentDetails = "from StudentDetails ds";
+        //query1 = entityManager.createQuery(query); SECOND WAY, WE CAN ADD PARAMETERS, ETC.
+        List<StudentDetails> studentDetails = entityManager.createQuery(queryGetStudentDetails, StudentDetails.class).getResultList();
+        displayStudentDetails(studentDetails);
+
+        System.out.println("\n------------------Deleting a student2 and student3 using remove():-----------------------");
+        entityManager.getTransaction().begin();
+
+        entityManager.remove(student2);
+        entityManager.remove(student3);
 
         entityManager.getTransaction().commit();
-        //displayStudents(theStudents);
+        System.out.println("\nChecking list of Students after deleting student2:");
+        theStudents = entityManager.createQuery(queryGetStudents, Student.class).getResultList();
+        displayStudents(theStudents);
+        System.out.println("Check if cascaded rows for deleted students' details were deleted too: ");
+        studentDetails = entityManager.createQuery(queryGetStudentDetails, StudentDetails.class).getResultList();
+        displayStudentDetails(studentDetails);
 
+        System.out.println("\n---------------------List of courses:------------------------------------------");
         List<Course> output = courseService.getAllCourses();
         for (Course course : output) {
             System.out.println(course.toString());
         }
-        //entityManager.flush();
-//        entityManager.getTransaction().begin();
-//        Instructor instructor1 = new Instructor("Marina");
-//        Instructor instructor2 = new Instructor("John");
-//        Course math = new Course("Math");
-//        Course history = new Course("History");
-//        Course programming = new Course("JavaProgramming");
-//        instructor1.addCourse(math);
-//        instructor1.addCourse(programming);
-//        instructor2.addCourse(history);
-//        entityManager.persist(instructor1);
-//        entityManager.persist(instructor2);
-//        entityManager.persist(history);
-//        entityManager.persist(math);
-//        entityManager.persist(programming);
-//        entityManager.flush();
+
+        System.out.println("\n------------------Creating instructors:-----------------------");
+        entityManager.getTransaction().begin();
+        Instructor instructor1 = new Instructor();
+        instructor1.setName("Marina");
+        entityManager.persist(instructor1);
+
+        Instructor instructor2 = new Instructor();
+        instructor2.setName("John");
+        entityManager.persist(instructor2);
+
+        Course math = new Course("Math");
+        Course history = new Course("History");
+        Course programming = new Course("JavaProgramming");
+        instructor1.addCourse(math);
+        instructor1.addCourse(programming);
+        instructor2.addCourse(history);
+
+
+
+        entityManager.persist(history);
+        entityManager.persist(math);
+        entityManager.persist(programming);
+
+        entityManager.getTransaction().commit();
 
         System.out.println("***************************************************************************************************************");
         Instructor instructorMarina = entityManager.find(Instructor.class, 1);
-        System.out.println("Looking for instructor Marina: "+instructorMarina.toString());
+        System.out.println("Looking for instructor with Id=1: "+instructorMarina.toString());
         System.out.println("courses: "+instructorMarina.getListCourses());
 
         System.out.println(courseService.getInstructor("Marina").toString());
 
         System.out.println("Done!");
+        courseService.close();
         entityManager.close();
         entityManagerFactory.close();
     }
@@ -132,11 +164,16 @@ public class Main {
             System.out.println(student.toString());
         }
     }
+    private static void displayStudentDetails(List<StudentDetails> list) {
+        for (StudentDetails details : list) {
+            System.out.println(details.toString());
+        }
+    }
+
     public static List<Student> getStudentsFromDB() {
         EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("MSMDB");
         EntityManager entityManager = entityManagerFactory.createEntityManager();
-        EntityTransaction transaction = entityManager.getTransaction();
-        transaction.begin();
+        //entityManager.getTransaction().begin();
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Student> cq = cb.createQuery(Student.class);
         Root<Student> rootEntry = cq.from(Student.class);

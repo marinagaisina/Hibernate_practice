@@ -1,0 +1,10 @@
+insert into Course (cName, instructorId) values ('English', 1);
+insert into Course (cName, instructorId) values ('Mathematics', 2);
+insert into Course (cName, instructorId) values ('Anatomy', 3);
+insert into Course (cName, instructorId) values ('Organic Chemistry', 3);
+insert into Course (cName, instructorId) values ('Physics', 4);
+insert into Course (cName, instructorId) values ('Digital Logic', 2);
+insert into Course (cName, instructorId) values ('Object Oriented Programming', 5);
+insert into Course (cName, instructorId) values ('Data Structures', 2);
+insert into Course (cName, instructorId) values ('Politics', 1);
+insert into Course (cName, instructorId) values ('Art', 6);

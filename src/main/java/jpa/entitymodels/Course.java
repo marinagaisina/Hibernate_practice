@@ -5,24 +5,27 @@ import javax.persistence.*;
 @Table(name="course")
 public class Course {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "course_generator")
+    @SequenceGenerator(name="course_generator", sequenceName = "course_seq", initialValue = 11) //allocationSize = 100
     @Column(name="cId")
     private int cId;
 
     @Column(name="cName")
     private String cName;
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinColumn(name="instructorId")
     private Instructor instructor;
 
-    public Course(int cId, String cName, Instructor instructor) {
-        this.cId = cId;
+    public Course(String cName, Instructor instructor) {
         this.cName = cName;
         this.instructor = instructor;
     }
+    public Course(String cName) {
+        this.cName = cName;
+    }
 
     public Course() {
-
     }
 
     public int getcId() {
@@ -37,17 +40,9 @@ public class Course {
         return cName;
     }
 
-//    public jpa.entities.Student getStudent() {
-//        return student;
-//    }
-
     public void setcName(String cName) {
         this.cName = cName;
     }
-
-//    public void setStudent(jpa.entities.Student student) {
-//        this.student = student;
-//    }
 
     public void setInstructor(Instructor instructor) {
         this.instructor = instructor;
@@ -59,7 +54,7 @@ public class Course {
 
     @Override
     public String toString() {
-        return new StringBuilder().append(this.cId).append(". ")
-                .append(this.cName).append(", ").append(this.instructor).toString();
+        return this.cId + ". " +
+                this.cName + ", " + this.instructor;
     }
 }

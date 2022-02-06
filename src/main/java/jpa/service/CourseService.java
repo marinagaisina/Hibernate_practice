@@ -12,19 +12,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CourseService implements CourseDAO {
+    private final EntityManager entityManager;
+
+    public CourseService() {
+        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("MSMDB");
+        entityManager = entityManagerFactory.createEntityManager();
+    }
+
+    public void close() {
+        entityManager.close();
+    }
 
     @Override
     public List<Course> getAllCourses() {
-        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("MSMDB");
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        EntityTransaction transaction = entityManager.getTransaction();
-        transaction.begin();
 
         List<Course> list = entityManager.createQuery("select c from Course c", Course.class).getResultList();
-
-        transaction.commit();
-        entityManager.close();
-        entityManagerFactory.close();
 
 //        for (Course course : list) {
 //            System.out.println(course.toString());
@@ -34,10 +36,6 @@ public class CourseService implements CourseDAO {
 
     @Override
     public Instructor getInstructor(String instructorName) {
-        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("MSMDB");
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        EntityTransaction transaction = entityManager.getTransaction();
-        transaction.begin();
 
         Query query = entityManager.createQuery("select i from Instructor i where i.name =:requiredName", Instructor.class)
                 .setParameter("requiredName", instructorName);
@@ -45,11 +43,7 @@ public class CourseService implements CourseDAO {
         List<Instructor> list = entityManager.createQuery("select i from Instructor i where i.name =:requiredName", Instructor.class)
                 .setParameter("requiredName", instructorName).getResultList();
 
-        Instructor instructor = (Instructor) query.getResultList().get(0);
-        transaction.commit();
-        entityManager.close();
-        entityManagerFactory.close();
-        return instructor;
+        return (Instructor) query.getResultList().get(0);
 
 /* ---------------------- using Criteria ! -----------------------------
         public Employee getEmployeeByEmail(String empEmail) {
